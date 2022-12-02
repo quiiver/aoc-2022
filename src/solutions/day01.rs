@@ -1,5 +1,5 @@
 
-pub fn solution(input: String) {
+pub fn solution(input: &String) {
     let mut sum_calories: Vec<u32> = input
         .split("\n\n")
         .map(|x| x.split('\n')

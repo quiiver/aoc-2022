@@ -15,8 +15,9 @@ pub fn read_file(day: u8) -> String {
     f.expect("could not open input file")
 }
 
-static SOLUTIONS: &[fn(String)] = &[
+static SOLUTIONS: &[fn(&String)] = &[
     solutions::day01::solution,
+    solutions::day02::solution,
 ];
 
 fn main() {
@@ -24,7 +25,7 @@ fn main() {
     match day_arg {
         Ok(day) => {
             if day <= SOLUTIONS.len() {
-                SOLUTIONS[(day-1)](read_file(day as u8))
+                SOLUTIONS[(day-1)](&read_file(day as u8))
             } else {
                 println!("Day argument out of bounds")
             }
