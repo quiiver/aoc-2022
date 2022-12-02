@@ -1,67 +1,22 @@
 
-fn part1(input: &String) -> u32 {
+fn solve(input: &String, scores: &[u32]) -> u32 {
     input
         .lines()
         .map(|s| {
-            s.split(' ').collect()
+            s.split(' ')
+                .flat_map(|x| x.chars())
+                .collect::<Vec<char>>()
         })
-        .map(|xs: Vec<&str>| match xs[..] {
-            [opponent, "X"] => (match opponent {
-                "A"=> 3,
-                "B" => 0,
-                "C" => 6,
-                _ => 0,
-            }) + 1,
-            [opponent, "Y"] => (match opponent {
-                "A"=> 6,
-                "B" => 3,
-                "C" => 0,
-                _ => 0,
-            }) + 2,
-            [opponent, "Z"] => (match opponent {
-                "A"=> 0,
-                "B" => 6,
-                "C" => 3,
-                _ => 0,
-            }) + 3,
-            _ => 0
+        .map(|xs: Vec<char>| match xs[..] {
+            [l, r] => 3*(l as u32 - 'A' as u32) + r as u32 - 'X' as u32,
+            _ => 10,
         })
-        .sum()
-}
-
-fn part2(input: &String) -> u32 {
-    input
-        .lines()
-        .map(|s| {
-            s.split(' ').collect()
-        })
-        .map(|xs: Vec<&str>| match xs[..] {
-            // rock
-            ["A", play] => (match play {
-                "X"=> 0 + 3,
-                "Y" => 3 + 1,
-                "Z" => 6 + 2,
-                _ => 0,
-            }),
-            ["B", play] => (match play {
-                "X"=> 0 + 1,
-                "Y" => 3 + 2,
-                "Z" => 6 + 3,
-                _ => 0,
-            }),
-            ["C", play] => (match play {
-                "X"=> 0 + 2,
-                "Y" => 3 + 3,
-                "Z" => 6 + 1,
-                _ => 0,
-            }),
-            _ => 0
-        })
+        .map(|idx| scores[idx as usize])
         .sum()
 }
 
 pub fn solution(input: &String) {
-    println!("part1 {:?}", part1(input));
+    println!("part1 {:?}", solve(input, &[4, 8, 3, 1, 5, 9, 7, 2, 6]));
 
-    println!("part2 {:?}", part2(input));
+    println!("part2 {:?}", solve(input, &[3, 4, 8, 1, 5, 9, 2, 6, 7]));
 }
