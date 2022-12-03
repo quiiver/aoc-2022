@@ -18,6 +18,7 @@ pub fn read_file(day: u8) -> String {
 static SOLUTIONS: &[fn(&String)] = &[
     solutions::day01::solution,
     solutions::day02::solution,
+    solutions::day03::solution,
 ];
 
 fn main() {

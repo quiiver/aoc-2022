@@ -9,7 +9,7 @@ fn solve(input: &String, scores: &[u32]) -> u32 {
         })
         .map(|xs: Vec<char>| match xs[..] {
             [l, r] => 3*(l as u32 - 'A' as u32) + r as u32 - 'X' as u32,
-            _ => 10,
+            _ => panic!(),
         })
         .map(|idx| scores[idx as usize])
         .sum()
