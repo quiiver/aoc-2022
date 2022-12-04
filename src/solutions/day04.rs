@@ -14,18 +14,10 @@ fn solve(input: &String, check: fn((u32, u32), (u32, u32)) -> u32) -> u32 {
 }
 pub fn solution(input: &String) {
     println!("part1 {:?}", solve(input, |l, r| {
-        if l.0 >= r.0 && l.1 <= r.1 || l.0 <= r.1 && l.1 >= r.1 {
-            1
-        } else {
-            0
-        }
-    }));
+        l.0 >= r.0 && l.1 <= r.1 || l.0 <= r.1 && l.1 >= r.1
+    } as u32));
 
     println!("part2 {:?}", solve(input, |l, r| {
-        if l.1 >= r.0 && l.0 <= r.1 || r.1 >= l.0 && r.0 <= l.1 {
-            1
-        } else {
-            0
-        }
-    }));
+        l.1 >= r.0 && l.0 <= r.1 || r.1 >= l.0 && r.0 <= l.1
+    } as u32));
 }
