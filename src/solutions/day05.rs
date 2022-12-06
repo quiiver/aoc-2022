@@ -1,5 +1,26 @@
 use std::{collections::VecDeque, str::Lines};
 
+#[derive(Debug)]
+struct Move {
+    from: usize,
+    to: usize,
+    count: u32,
+}
+
+impl Move {
+    fn from(line: &str) -> Option<Move> {
+        if line.starts_with("move") {
+            let m: Vec<u32> = line
+                .split_whitespace()
+                .filter(|s| s.matches(char::is_numeric).count() > 0 )
+                .map(|s| s.parse().unwrap())
+                .collect();
+            Some(Move { from: (m[1] - 1) as usize, to: (m[2] - 1) as usize, count: m[0] })
+        } else {
+            None
+        }
+    }
+}
 fn parse_columns(row: &str) -> Vec<String> {
     row.chars()
         .collect::<Vec<char>>()
@@ -34,28 +55,6 @@ fn parse_stacks(rows: Vec<&str>) -> Vec<VecDeque<String>> {
     }
 
     stacks
-}
-
-#[derive(Debug)]
-struct Move {
-    from: usize,
-    to: usize,
-    count: u32,
-}
-
-impl Move {
-    fn from(line: &str) -> Option<Move> {
-        if line.starts_with("move") {
-            let m: Vec<u32> = line
-                .split_whitespace()
-                .filter(|s| s.matches(char::is_numeric).count() > 0 )
-                .map(|s| s.parse().unwrap())
-                .collect();
-            Some(Move { from: (m[1] -1) as usize, to: (m[2] -1) as usize, count: m[0] })
-        } else {
-            None
-        }
-    }
 }
 
 fn parse_moves(lines: Lines) -> Vec<Move> {
