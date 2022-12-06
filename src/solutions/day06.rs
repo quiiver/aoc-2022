@@ -1,18 +1,16 @@
 use std::collections::{HashSet, VecDeque};
 
-fn solve(input: &String, packet_size: usize) -> u32 {
+fn solve(input: &String, packet_size: usize) -> usize {
     let mut packet = VecDeque::new();
     input.chars()
-        .take_while(|c| {
+        .position(|c| {
             packet.push_back(c.to_owned());
             if packet.len() > packet_size {
                 packet.pop_front();
             }
             let set = HashSet::<_>::from_iter(&packet);
-            !(packet.len() == packet_size && packet.len() == set.len())
-        })
-        // take_while stops before the last char so just add 1 here.
-        .count() as u32 + 1
+            packet.len() == packet_size && packet.len() == set.len()
+        }).unwrap() + 1 // account for 0 offset
 }
 
 pub fn solution(input: &String) {
