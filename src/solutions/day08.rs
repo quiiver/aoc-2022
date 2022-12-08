@@ -49,17 +49,10 @@ fn check_score((y, x): (usize, usize), grid: &Vec<Vec<u32>>) -> u32 {
     let left = grid[y][0..x].iter().rev().map(|x| *x);
     let right = grid[y][x+1..width].iter().map(|x| *x);
 
-    let top_count = count_trees(point, top.collect::<Vec<u32>>());
-    let bottom_count = count_trees(point, bottom.collect::<Vec<u32>>());
-    let left_count = count_trees(point, left.collect::<Vec<u32>>());
-    let right_count = count_trees(point, right.collect::<Vec<u32>>());
-
-    let score = top_count
-        * bottom_count
-        * left_count
-        * right_count;
-
-    score
+    count_trees(point, top.collect::<Vec<u32>>())
+        * count_trees(point, bottom.collect::<Vec<u32>>())
+        * count_trees(point, left.collect::<Vec<u32>>())
+        * count_trees(point, right.collect::<Vec<u32>>())
 }
 
 fn solve2(input: &String) -> u32 {
