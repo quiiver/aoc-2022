@@ -1,7 +1,18 @@
 
+fn parse_grid(input: &String) -> Vec<Vec<u32>> {
+    input.lines()
+        .map(|line| line
+            .chars()
+            .flat_map(|s| s.to_string().parse() )
+            .collect()
+        )
+        .collect()
+}
+
 fn check_visible((y, x): (usize, usize), grid: &Vec<Vec<u32>>) -> bool {
     let (height, width) = (grid.len(), grid[0].len());
     let point = Some(grid[y][x]);
+
     let top = grid[0..y].iter().map(|xs| xs[x]).max();
     let bottom = grid[y+1..height].iter().map(|xs| xs[x]).max();
     let left = Some(*grid[y][0..x].iter().max().unwrap());
@@ -11,13 +22,7 @@ fn check_visible((y, x): (usize, usize), grid: &Vec<Vec<u32>>) -> bool {
 }
 
 fn solve(input: &String) -> u32 {
-    let grid: Vec<Vec<u32>> = input.lines()
-        .map(|line| line
-            .chars()
-            .flat_map(|s| s.to_string().parse() )
-            .collect()
-        )
-        .collect();
+    let grid = parse_grid(input);
     let (height, width) = (grid.len(), grid[0].len());
     let mut visible = 0;
     for y in 1..(height-1) {
@@ -56,13 +61,7 @@ fn check_score((y, x): (usize, usize), grid: &Vec<Vec<u32>>) -> u32 {
 }
 
 fn solve2(input: &String) -> u32 {
-    let grid: Vec<Vec<u32>> = input.lines()
-        .map(|line| line
-            .chars()
-            .flat_map(|s| s.to_string().parse() )
-            .collect()
-        )
-        .collect();
+    let grid = parse_grid(input);
     let (height, width) = (grid.len(), grid[0].len());
     let mut scores: Vec<u32> = Vec::new();
     for y in 1..height-1 {
