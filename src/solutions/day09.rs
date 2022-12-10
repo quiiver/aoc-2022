@@ -1,95 +1,80 @@
 use std::env;
 use std::collections::HashSet;
+use std::ops::{Add, Sub};
 
-#[derive(Debug, Copy, PartialEq, PartialOrd, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 struct Point {
     x: i32,
     y: i32,
 }
 
+// directions
+static UP: Point = Point { x: 0, y: 1};
+static DOWN: Point = Point { x: 0, y: -1};
+static RIGHT: Point = Point { x: 1, y: 0};
+static LEFT: Point = Point { x: -1, y: 0};
+
 impl Point {
+
+    fn new() -> Self {
+        Point::from(0, 0)
+    }
+
     fn from(x: i32, y: i32) -> Point {
         Point { x, y }
     }
 
-    fn add(&self, point: &Point) -> Point {
-        Point {
-            x: self.x + point.x,
-            y: self.y + point.y,
-        }
-    }
-
-    fn is_touching(&self, point: &Point) -> bool {
+    fn is_touching(self, point: &Point) -> bool {
         (point.x - self.x == 0 && point.y - self.y == 0) // overlap
         || ((point.x - self.x).abs() == 1 && (point.y - self.y == 0))
         || ((point.y - self.y).abs() == 1 && (point.x - self.x == 0))
         || ((point.x - self.x).abs() == 1 && (point.y - self.y).abs() == 1)
     }
 
-    fn get_move(&self, other: Self) -> Self {
-        if self.x - other.x == 0 {
-            match self.y > other.y {
-                true => UP,
-                false => DOWN,
-            }
-        } else if self.y - other.y == 0 {
-            match self.x > other.x {
-                true => RIGHT,
-                false => LEFT,
-            }
+    fn get_move(self, other: Self) -> Self {
+        let delta = self - other;
+        if delta.x.abs() == 1 && delta.y.abs() == 1 {
+            Point::from(0, 0)
         } else {
-            // right
-            if self.x > other.x {
-                // above
-                if self.y > other.y {
-                    RIGHT.add(&UP)
-                } else {
-                    RIGHT.add(&DOWN)
-                }
-            // left
-            } else {
-                // above
-                if self.y > other.y {
-                    LEFT.add(&UP)
-                } else {
-                    LEFT.add(&DOWN)
-                }
-            }
+            Point {x: delta.x.signum(), y: delta.y.signum()}
         }
     }
-}
 
-
-impl Ord for Point {
-    fn cmp(&self, _: &Self) -> std::cmp::Ordering {
-        std::cmp::Ordering::Equal
-    }
-
-    fn min(self, other: Self) -> Self
-        where
-            Self: Sized, {
+    fn min(self, other: &Self) -> Self {
         Point{ x: self.x.min(other.x), y: self.y.min(other.y) }
     }
 
-    fn max(self, other: Self) -> Self
-        where
-            Self: Sized, {
+    fn max(self, other: &Self) -> Self {
         Point { x: self.x.max(other.x), y: self.y.max(other.y) }
     }
 }
 
-impl Clone for Point {
-    fn clone(&self) -> Point {
-        Point { x: self.x, y: self.y }
+impl Add for Point {
+    type Output = Self;
+
+    fn add(self, point: Self) -> Self {
+        Point {
+            x: self.x + point.x,
+            y: self.y + point.y,
+        }
     }
 }
 
-static UP: Point = Point { x: 0, y: 1};
-static DOWN: Point = Point { x: 0, y: -1};
-static RIGHT: Point = Point { x: 1, y: 0};
-static LEFT: Point = Point { x: -1, y: 0};
+impl Sub for Point {
+    type Output = Self;
 
-fn draw_visits(visited: &HashSet<Point>, min: Point, max: Point) {
+    fn sub(self, other: Self) -> Self {
+        Point {
+            x: self.x - other.x,
+            y: self.y - other.y,
+        }
+    }
+}
+
+fn draw_visits(visited: &HashSet<Point>) {
+    let min = visited.iter().fold(Point::new(), |acc, p| acc.min(p));
+    let max = visited.iter().fold(Point::new(), |acc, p| acc.max(p));
+
     println!("{}", ["-"; 80].join(""));
     for y in ((min.y-1)..(max.y+1)).rev() {
         for x in min.x-1..max.x+1 {
@@ -99,15 +84,12 @@ fn draw_visits(visited: &HashSet<Point>, min: Point, max: Point) {
         print!("\n");
     }
     println!("{}", ["-"; 80].join(""));
-
 }
 
 fn solve(input: &String, size: usize, draw: bool) -> usize {
-    let mut max = Point::from(0, 0);
-    let mut min = Point::from(0, 0);
     let mut knots: Vec<Point> = (0..size).map(|_| Point::from(0, 0)).collect();
     let mut visited: HashSet<Point> = HashSet::new();
-    visited.insert(knots[size-1].clone());
+    visited.insert(knots[size-1]);
 
     for line in input.lines() {
         let split: Vec<&str> = line.split_whitespace().collect();
@@ -124,16 +106,13 @@ fn solve(input: &String, size: usize, draw: bool) -> usize {
             _ => 0,
         };
 
-
         for _ in 0..count {
-            knots[0] = knots[0].add(&direction);
-            max = max.max(knots[0]);
-            min = min.min(knots[0]);
+            knots[0] = knots[0] + direction;
             for idx in 1..size {
                 if !knots[idx-1].is_touching(&knots[idx]) {
-                    knots[idx] = knots[idx].add(&knots[idx-1].get_move(knots[idx]));
+                    knots[idx] = knots[idx] + knots[idx-1].get_move(knots[idx]);
                     if idx+1 == size {
-                        visited.insert(knots[idx].clone());
+                        visited.insert(knots[idx]);
                     }
                 }
             }
@@ -141,7 +120,7 @@ fn solve(input: &String, size: usize, draw: bool) -> usize {
     }
 
     if draw {
-        draw_visits(&visited, min, max);
+        draw_visits(&visited);
     }
 
     visited.len()
